@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"time"
 	"testing"
+	"time"
 )
 
 const targetSizeMB = 20
@@ -68,12 +68,12 @@ func generateLargeLog(filePath string, targetSizeMB int) error {
 
 // Test cases for benchmarking
 var table = []struct {
-    SizeInMB int
+	SizeInMB int
 }{
-    {SizeInMB: 10},
-    {SizeInMB: 100},
-    {SizeInMB: 200},
-    {SizeInMB: 500},
+	{SizeInMB: 10},
+	{SizeInMB: 100},
+	{SizeInMB: 200},
+	{SizeInMB: 500},
 	{SizeInMB: 1000},
 }
 
