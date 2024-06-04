@@ -29,6 +29,12 @@ func (s *Server) handleGetLogFiles(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if len(logFiles) == 0 {
+		http.Error(w, "No lines found", http.StatusNotFound)
+		return
+	}
+
 	response := GetLogFilesResponse{
 		LogFiles: logFiles,
 	}

@@ -81,8 +81,6 @@ var table = []struct {
 func Benchmark_ReadLastNLines(b *testing.B) {
 	for _, v := range table {
 		b.Run(fmt.Sprintf("input_size_%d", v.SizeInMB), func(b *testing.B) {
-			rand.Seed(time.Now().UnixNano())
-
 			logFilePath := "large_access.log"
 			err := generateLargeLog(logFilePath, targetSizeMB)
 			if err != nil {
@@ -91,7 +89,7 @@ func Benchmark_ReadLastNLines(b *testing.B) {
 
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				_, err := ReadLastNLines(logFilePath, 1000)
+				_, err := ReadLastNLines(logFilePath, 1000, "")
 				if err != nil {
 					b.Fatalf("Failed to read last N lines: %v", err)
 				}

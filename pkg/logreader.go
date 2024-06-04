@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 // ReadLastNLines reads the last N lines from a file and returns them as a slice of strings.
 // If the file has less than N lines, it returns all lines.
-func ReadLastNLines(filename string, n int) ([]string, error) {
+func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 	if n <= 0 {
 		return nil, fmt.Errorf("n must be a positive integer, received %d", n)
 	}
@@ -46,7 +47,10 @@ func ReadLastNLines(filename string, n int) ([]string, error) {
 		// If we find a newline character, we have a line
 		if buf[0] == '\n' {
 			if line != "" {
-				lines = append([]string{line}, lines...)
+				// TODO - Optimize the contains check while gathering the buffer
+				if filter == "" || strings.Contains(line, filter) {
+					lines = append([]string{line}, lines...)
+				}
 				line = ""
 			}
 		} else {
@@ -56,7 +60,9 @@ func ReadLastNLines(filename string, n int) ([]string, error) {
 
 	// If we have a line that is not empty, add it to the list
 	if line != "" && len(lines) < n {
-		lines = append([]string{line}, lines...)
+		if filter == "" || strings.Contains(line, filter) {
+			lines = append([]string{line}, lines...)
+		}
 	}
 
 	return lines, nil

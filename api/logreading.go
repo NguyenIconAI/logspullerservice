@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -35,6 +36,15 @@ func (s *Server) handleReadLogFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	filter := r.URL.Query().Get("filter")
+	if filter == "" {
+		isAlphanumeric := regexp.MustCompile(`^[a-zA-Z0-9]*$`).MatchString(filter)
+		if !isAlphanumeric {
+			http.Error(w, "Missing 'file' parameter", http.StatusBadRequest)
+			return
+		}
+	}
+
 	// Sanitize the file path to avoid security issues
 	logFilePath, err := sanitizeFilePath(logFile)
 	if err != nil {
@@ -43,12 +53,16 @@ func (s *Server) handleReadLogFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Read last N lines
-	response, err := logHandler.ReadLastNLines(logFilePath, numOfLines)
+	response, err := logHandler.ReadLastNLines(logFilePath, numOfLines, filter)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	if len(response) == 0 {
+		http.Error(w, "No lines found", http.StatusNotFound)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
