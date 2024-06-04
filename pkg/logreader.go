@@ -1,16 +1,17 @@
 package pkg
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 // ReadLastNLines reads the last N lines from a file and returns them as a slice of strings.
 // If the file has less than N lines, it returns all lines.
-// N must be a positive integer.
-// File must exist and a text file.
 func ReadLastNLines(filename string, n int) ([]string, error) {
 	if n <= 0 {
 		return nil, fmt.Errorf("N must be a positive integer")
 	}
-	
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
