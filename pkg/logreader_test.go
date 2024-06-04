@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// createTempFile creates a temporary file with the given content.
 func createTempFile(t *testing.T, content string) *os.File {
 	tmpfile, err := ioutil.TempFile("", "example")
 	if err != nil {
@@ -25,6 +26,7 @@ func createTempFile(t *testing.T, content string) *os.File {
 	return tmpfile
 }
 
+// Test_ReadLastNLines tests the ReadLastNLines function.
 func Test_ReadLastNLines(t *testing.T) {
 	content := `line1
 line2

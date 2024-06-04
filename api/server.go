@@ -18,7 +18,6 @@ func NewServer(port string) *Server {
 
 // Start a server instance
 func (s *Server) Start() error {
-	// register a handle of the path
 	http.HandleFunc("/health", s.handleHealthCheck)
 
 	// TODO: Adding authentication and logging middleware
