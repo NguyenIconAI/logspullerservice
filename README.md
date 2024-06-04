@@ -113,7 +113,7 @@ To run benchmark tests, use the following command:
 make benchmark-test
 ```
 
-The test will prepare an apache access.log files with random information and get the last 1000 lines with filter. The file sizes is vary from 10MB to 5GB.
+The test will prepare an apache access.log file with random information and get the last 1000 lines with filter. The file sizes is vary from 10MB to 5GB.
 
 ```
 	{SizeInMB: 10},   // 10MB
@@ -241,7 +241,3 @@ To execute the endpoints that require authorization using Swagger UI, follow the
 ## GitHub Actions
 
 This project includes a GitHub Actions workflow to build the application .The workflow is triggered on a push to main or can be manually triggered. It builds the Go application for go 1.22
-
-## Contributing
-
-Feel free to fork this repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
