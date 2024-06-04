@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -9,7 +10,7 @@ import (
 // If the file has less than N lines, it returns all lines.
 func ReadLastNLines(filename string, n int) ([]string, error) {
 	if n <= 0 {
-		return nil, fmt.Errorf("N must be a positive integer")
+		return nil, fmt.Errorf("n must be a positive integer, received %d", n)
 	}
 
 	file, err := os.Open(filename)
@@ -26,13 +27,13 @@ func ReadLastNLines(filename string, n int) ([]string, error) {
 	size := stat.Size()
 
 	// Seek from the end
-	var lines []string 
+	var lines []string
 	buf := make([]byte, 1)
 	line := ""
 
 	// Start reading from the end of the file
-	for i:=size-1; i>0 && len(lines) < n; i-- {
-		_, err := file.Seek(i, os.SEEK_SET)
+	for i := size - 1; i > 0 && len(lines) < n; i-- {
+		_, err := file.Seek(i, io.SeekStart)
 		if err != nil {
 			return nil, err
 		}
