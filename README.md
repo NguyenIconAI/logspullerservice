@@ -138,7 +138,7 @@ To execute the endpoints that require authorization using Swagger UI, follow the
 
 This project includes a GitHub Actions workflow to build and release the application for different Unix-based operating systems.
 
-The workflow is triggered on a push to a tag matching the pattern `v*.*.*` or can be manually triggered. It builds the Go application for different versions of Go (`1.20`, `1.21`, `1.22`) and operating systems (`ubuntu-latest`, `macos-latest`), then uploads the build artifacts and creates a release.
+The workflow is triggered on a push to a tag matching the pattern `v*.*.*` or can be manually triggered. It builds the Go application for go 1.22 and operating systems (`ubuntu-latest`, `macos-latest`), then uploads the build artifacts and creates a release.
 
 ## Makefile Commands
 

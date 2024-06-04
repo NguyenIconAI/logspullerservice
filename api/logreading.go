@@ -24,6 +24,7 @@ import (
 // @Failure 400 {string} string "Invalid 'n' parameter"
 // @Failure 400 {string} string "Missing 'file' parameter"
 // @Failure 500 {string} string "Internal server error"
+// @Security ApiKeyAuth
 // @Router /v1/log [get]
 func (s *Server) handleReadLogFile(w http.ResponseWriter, r *http.Request) {
 	numOfLinesStr := r.URL.Query().Get("n")

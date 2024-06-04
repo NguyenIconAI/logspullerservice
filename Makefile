@@ -3,7 +3,7 @@ server:
 
 build:
 	swag init -g main.go
-	go build -o bin/server main.go
+	go build -o bin/logpuller main.go
 
 benchmark-test:
 	go test ./... -bench=.
