@@ -18,7 +18,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
-		if token != os.Getenv(constants.ApiKeyEnvVar) { // Replace with your actual secret token
+		if token != os.Getenv(constants.ApiKeyEnvVar) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

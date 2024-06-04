@@ -10,6 +10,53 @@ This is a log puller service that provides a RESTful API for retrieving log file
 - Swagger documentation for API endpoints.
 - Middleware to check for an authorization key.
 
+## TL;DR:
+
+- Build docker image, create 3 containers:
+
+```
+make docker
+docker-compose up -d
+```
+
+- Test: List logs
+
+```
+curl --location 'http://localhost:3001/v1/logs' \
+--header 'Authorization: Bearer test1'
+```
+
+- Test: Read a log in the server
+
+```
+curl --location 'http://localhost:3001/v1/log?file=dpkg.log&n=20' \
+--header 'Authorization: Bearer test1'
+```
+
+- Test: Read logs from remote server
+
+```
+curl --location 'http://localhost:3001/v1/remotelog' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer test1' \
+--data '{
+    "file": "dpkg.log",
+    "n": 10,
+    "hosts": [
+        {
+            "host_name": "http://logpuller2:3000",
+            "api_key": "test2"
+        },
+        {
+            "host_name": "http://logpuller3:3000",
+            "api_key": "test3"
+        }
+    ]
+}'
+```
+
+- You can use Swagger to try the API at http://localhost:3000/swagger/index.html
+
 ## Installation
 
 To install the necessary dependencies and set up the project, run the following commands:
@@ -53,7 +100,9 @@ make test
 To run integration tests, use the following command:
 
 ```sh
-make integ-test
+make docker
+docker run --rm -p 3000:3000 -d --env API_KEY="test1" logpuller
+API_KEY="test1" make integ-test
 ```
 
 ### Benchmark Tests

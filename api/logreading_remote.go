@@ -54,6 +54,7 @@ func (s *Server) handleReadRemoteLogFile(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
+	// we don't validate the request here because the hosts will validate them
 
 	response := make(map[string]RemoteLogResponse)
 
@@ -72,12 +73,22 @@ func (s *Server) handleReadRemoteLogFile(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(response)
 }
 
-func getLogFromHost(host HostInfo, file string, n int, filter string) RemoteLogResponse {
+// Simple rest client to get logs from a remote host
+func getLogFromHost(host HostInfo, file string, n int, filter string) (response RemoteLogResponse) {
+	defer func() {
+		if r := recover(); r != nil {
+			response = RemoteLogResponse{
+				Status:     "panic occurred",
+				StatusCode: http.StatusInternalServerError,
+				Logs:       []string{fmt.Sprintf("Recovered from panic: %v", r)},
+			}
+		}
+	}()
+
 	bearer := "Bearer " + host.ApiKey
 	url := fmt.Sprintf(host.HostName+"/v1/log?file=%s&n=%d&filter=%s", file, n, filter)
 
 	req, _ := http.NewRequest("GET", url, nil)
-
 	req.Header.Add("Authorization", bearer)
 
 	client := utils.NewRetryableClient()

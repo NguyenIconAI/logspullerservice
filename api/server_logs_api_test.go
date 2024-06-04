@@ -57,9 +57,7 @@ func IntegTest_GetLogFiles(t *testing.T) {
 	}
 
 	expectedFiles := []string{
-		"/var/log/syslog",
-		"/var/log/auth.log",
-		"/var/log/kern.log",
+		"/var/log/dpkg.log",
 	}
 
 	for _, expectedFile := range expectedFiles {
@@ -72,13 +70,13 @@ func IntegTest_GetLogFiles(t *testing.T) {
 func IntegTest_GetLogContent(t *testing.T) {
 	bearer := "Bearer " + os.Getenv(constants.ApiKeyEnvVar)
 	expectedLength := 10
-	url := fmt.Sprintf("http://localhost:3000/v1/log?file=auth.log&n=%d&filter=session", expectedLength)
+	url := fmt.Sprintf("http://localhost:3000/v1/log?file=dpkg.log&n=%d&filter=installed", expectedLength)
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", bearer)
 
 	client := &http.Client{}
-	resp, err :err= client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Errorf("error: %v", err)
 		t.FailNow()

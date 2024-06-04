@@ -1,0 +1,38 @@
+version: '3'
+services:
+  logpuller1:
+    image: logpuller
+    container_name: logpuller1
+    environment:
+      - API_KEY=test1
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    networks:
+      - logpuller-network
+
+  logpuller2:
+    image: logpuller
+    container_name: logpuller2
+    environment:
+      - API_KEY=test2
+    ports:
+      - "3002:3000"
+    restart: unless-stopped
+    networks:
+      - logpuller-network
+
+  logpuller3:
+    image: logpuller
+    container_name: logpuller3
+    environment:
+      - API_KEY=test3
+    ports:
+      - "3003:3000"
+    restart: unless-stopped
+    networks:
+      - logpuller-network
+
+networks:
+  logpuller-network:
+    driver: bridge
