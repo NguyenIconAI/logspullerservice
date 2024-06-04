@@ -92,6 +92,9 @@ func sanitizeFilePath(filePath string) (string, error) {
 
 // Clean the file path by removing any redundant elements
 func cleanFilePath(filePath string) string {
+	// Remove leading and trailing whitespace
+	filePath = strings.TrimSpace(filePath)
+
 	// Remove leading and trailing slashes
 	filePath = strings.Trim(filePath, "/")
 

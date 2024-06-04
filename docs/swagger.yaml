@@ -72,6 +72,8 @@ paths:
           description: Internal server error
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Read log file
       tags:
       - logs

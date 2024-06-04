@@ -23,10 +23,10 @@ go mod tidy
 To start the server, use the following command:
 
 ```sh
-make server
+API_KEY="your choice of API key" make server
 ```
 
-The server will run on the port specified (default is `:3000`).
+The server will run on the port specified (default is `:3000`) with a specific API key. Using this API key to communicate with this server.
 
 ## Building the Project
 
@@ -137,39 +137,6 @@ To execute the endpoints that require authorization using Swagger UI, follow the
 ## GitHub Actions
 
 This project includes a GitHub Actions workflow to build the application .The workflow is triggered on a push to main or can be manually triggered. It builds the Go application for go 1.22
-
-## Makefile Commands
-
-The project includes a `Makefile` with the following commands:
-
-- **Start the server**:
-
-  ```sh
-  make server
-  ```
-
-- **Build the project** (includes generating Swagger documentation):
-
-  ```sh
-  make build
-  ```
-
-- **Run unit tests**:
-
-  ```sh
-  make test
-  ```
-
-- **Run integration tests**:
-
-  ```sh
-  make integ-test
-  ```
-
-- **Run benchmark tests**:
-  ```sh
-  make benchmark-test
-  ```
 
 ## Contributing
 

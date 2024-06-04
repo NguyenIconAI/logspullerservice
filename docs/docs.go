@@ -49,6 +49,11 @@ const docTemplate = `{
         },
         "/v1/log": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Reads the last N lines from a log file and returns them as a JSON array",
                 "produces": [
                     "application/json"
