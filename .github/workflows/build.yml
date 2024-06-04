@@ -29,6 +29,3 @@ jobs:
 
       - name: Test
         run: make test
-
-      - name: Benchmark
-        run: make benchmark

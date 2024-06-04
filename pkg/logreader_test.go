@@ -46,15 +46,19 @@ line12`
 
 	tests := []struct {
 		n        int
+		filter   string
 		expected []string
 	}{
-		{1, []string{"line12"}},
-		{5, []string{"line8", "line9", "line10", "line11", "line12"}},
-		{10, []string{"line3", "line4", "line5", "line6", "line7", "line8", "line9", "line10", "line11", "line12"}},
+		{1, "", []string{"line12"}},
+		{5, "", []string{"line8", "line9", "line10", "line11", "line12"}},
+		{10, "", []string{"line3", "line4", "line5", "line6", "line7", "line8", "line9", "line10", "line11", "line12"}},
+		{1, "line1", []string{"line12"}},
+		{3, "line1", []string{"line10", "line11", "line12"}},
+		{2, "line0", []string{}},
 	}
 
 	for _, test := range tests {
-		lines, err := ReadLastNLines(tmpfile.Name(), test.n)
+		lines, err := ReadLastNLines(tmpfile.Name(), test.n, test.filter)
 		if err != nil {
 			t.Errorf("Failed to read last %d lines: %v", test.n, err)
 		}
