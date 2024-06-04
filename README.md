@@ -109,11 +109,54 @@ make benchmark-test
   ["line 1", "line 2", "line 3"]
   ```
 
+### Fetch Logs from Remote Hosts
+
+- **URL**: `/v1/remote-log`
+- **Method**: `POST`
+- **Description**: Fetch the last N lines of logs from specified remote hosts.
+- **Request Body**:
+  ```json
+  {
+    "file": "string", // Log file to read
+    "n": 10, // Number of lines to read
+    "filter": "string", // Optional filter string
+    "hosts": [
+      {
+        "host_name": "http://remote-host-1:port",
+        "api_key": "remote-host-1-api-key"
+      },
+      {
+        "host_name": "http://remote-host-2:port",
+        "api_key": "remote-host-2-api-key"
+      }
+    ]
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "host_name": {
+      "status": "string",
+      "status_code": 200,
+      "logs": ["log line 1", "log line 2", "log line 3"]
+    }
+  }
+  ```
+
 ## Middleware
 
 ### Authorization Middleware
 
 The service includes a middleware to check for an `Authorization` header. The header must be in the format `Bearer your-secret-token`. If the token is invalid or missing, the request will be rejected with a `401 Unauthorized` status.
+
+### Log Middleware
+
+The service includes a middleware to log request and response details. This middleware logs the following information:
+
+- Request ID (based on the current timestamp in nanoseconds)
+- HTTP method and request URI
+- Response status code
+- Duration of the request processing
 
 ## Swagger Documentation
 

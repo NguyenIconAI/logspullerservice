@@ -20,9 +20,10 @@ func NewServer(port string) *Server {
 
 // Start a server instance
 func (s *Server) Start() error {
-	http.Handle("/health", middleware.LogMiddleware(http.HandlerFunc(s.handleHealthCheck)))
-	http.Handle("/v1/logs", middleware.LogMiddleware(middleware.AuthMiddleware(http.HandlerFunc(s.handleGetLogFiles))))
-	http.Handle("/v1/log", middleware.LogMiddleware(middleware.AuthMiddleware(http.HandlerFunc(s.handleReadLogFile))))
+	http.Handle("GET /health", middleware.LogMiddleware(http.HandlerFunc(s.handleHealthCheck)))
+	http.Handle("GET/v1/logs", middleware.LogMiddleware(middleware.AuthMiddleware(http.HandlerFunc(s.handleGetLogFiles))))
+	http.Handle("GET /v1/log", middleware.LogMiddleware(middleware.AuthMiddleware(http.HandlerFunc(s.handleReadLogFile))))
+	http.Handle("POST /v1/remotelog", middleware.LogMiddleware(middleware.AuthMiddleware(http.HandlerFunc(s.handleReadRemoteLogFile))))
 	// TODO: Adding logging middleware
 	return http.ListenAndServe(s.port, nil)
 }

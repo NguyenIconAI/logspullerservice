@@ -23,6 +23,7 @@ import (
 // @Success 200 {array} string
 // @Failure 400 {string} string "Invalid 'n' parameter"
 // @Failure 400 {string} string "Missing 'file' parameter"
+// @Failure 400 {string} string "Bad 'filter' parameter"
 // @Failure 500 {string} string "Internal server error"
 // @Security ApiKeyAuth
 // @Router /v1/log [get]
@@ -30,7 +31,7 @@ func (s *Server) handleReadLogFile(w http.ResponseWriter, r *http.Request) {
 	numOfLinesStr := r.URL.Query().Get("n")
 	numOfLines, err := strconv.Atoi(numOfLinesStr)
 	if err != nil || numOfLines <= 0 || numOfLines > 1000 {
-		http.Error(w, "Invalid 'n' parameter", http.StatusBadRequest)
+		http.Error(w, "Invalid 'n' parameter. N is within range [0..1000]", http.StatusBadRequest)
 		return
 	}
 
@@ -39,12 +40,20 @@ func (s *Server) handleReadLogFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Missing 'file' parameter", http.StatusBadRequest)
 		return
 	}
+	if len(logFile) > 250 {
+		http.Error(w, "File parameter is too long. Should less than 250 chars.", http.StatusBadRequest)
+		return
+	}
 
 	filter := r.URL.Query().Get("filter")
 	if filter == "" {
+		if len(filter) > 250 {
+			http.Error(w, "Filter parameter is too long. Should less than 250 chars.", http.StatusBadRequest)
+			return
+		}
 		isAlphanumeric := regexp.MustCompile(`^[a-zA-Z0-9]*$`).MatchString(filter)
 		if !isAlphanumeric {
-			http.Error(w, "Missing 'file' parameter", http.StatusBadRequest)
+			http.Error(w, "Bad 'filter' parameter, should be alphanumeric.", http.StatusBadRequest)
 			return
 		}
 	}

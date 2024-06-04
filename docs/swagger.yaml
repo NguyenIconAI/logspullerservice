@@ -7,6 +7,43 @@ definitions:
           type: string
         type: array
     type: object
+  api.HostInfo:
+    properties:
+      api_key:
+        type: string
+      host_name:
+        type: string
+    required:
+    - api_key
+    - host_name
+    type: object
+  api.RemoteLogRequest:
+    properties:
+      file:
+        type: string
+      filter:
+        type: string
+      hosts:
+        items:
+          $ref: '#/definitions/api.HostInfo'
+        type: array
+      "n":
+        type: integer
+    required:
+    - file
+    - hosts
+    type: object
+  api.RemoteLogResponse:
+    properties:
+      logs:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      status_code:
+        type: integer
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -65,7 +102,7 @@ paths:
               type: string
             type: array
         "400":
-          description: Missing 'file' parameter
+          description: Bad 'filter' parameter
           schema:
             type: string
         "500":
@@ -94,6 +131,41 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get log files
+      tags:
+      - logs
+  /v1/remotelog:
+    post:
+      consumes:
+      - application/json
+      description: Reads the last N lines from a log file on a remote host and returns
+        them as a JSON array
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.RemoteLogRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/api.RemoteLogResponse'
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Read remote log file
       tags:
       - logs
 securityDefinitions:

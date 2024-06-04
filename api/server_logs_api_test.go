@@ -78,7 +78,7 @@ func IntegTest_GetLogContent(t *testing.T) {
 	req.Header.Add("Authorization", bearer)
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err :err= client.Do(req)
 	if err != nil {
 		t.Errorf("error: %v", err)
 		t.FailNow()

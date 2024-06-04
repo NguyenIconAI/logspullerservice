@@ -95,7 +95,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Missing 'file' parameter",
+                        "description": "Bad 'filter' parameter",
                         "schema": {
                             "type": "string"
                         }
@@ -139,6 +139,60 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/remotelog": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Reads the last N lines from a log file on a remote host and returns them as a JSON array",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Read remote log file",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RemoteLogRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/api.RemoteLogResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -150,6 +204,62 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "api.HostInfo": {
+            "type": "object",
+            "required": [
+                "api_key",
+                "host_name"
+            ],
+            "properties": {
+                "api_key": {
+                    "type": "string"
+                },
+                "host_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.RemoteLogRequest": {
+            "type": "object",
+            "required": [
+                "file",
+                "hosts"
+            ],
+            "properties": {
+                "file": {
+                    "type": "string"
+                },
+                "filter": {
+                    "type": "string"
+                },
+                "hosts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.HostInfo"
+                    }
+                },
+                "n": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.RemoteLogResponse": {
+            "type": "object",
+            "properties": {
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "type": "integer"
                 }
             }
         }
