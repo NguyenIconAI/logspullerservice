@@ -10,4 +10,5 @@ import (
 func TestIntegTests(t *testing.T) {
 	t.Run("HealthCheck", IntegTest_HealthCheck)
 	t.Run("GetLogFiles", IntegTest_GetLogFiles)
+	t.Run("GetLogContent", IntegTest_GetLogContent)
 }

@@ -70,11 +70,13 @@ func generateLargeLog(filePath string, targetSizeMB int) error {
 var table = []struct {
 	SizeInMB int
 }{
-	{SizeInMB: 10},
-	{SizeInMB: 100},
-	{SizeInMB: 200},
-	{SizeInMB: 500},
-	{SizeInMB: 1000},
+	{SizeInMB: 10},   // 10MB
+	{SizeInMB: 100},  // 100MB
+	{SizeInMB: 200},  // 200MB
+	{SizeInMB: 500},  // 500MB
+	{SizeInMB: 1000}, // 1GB
+	{SizeInMB: 2000}, // 2GB
+	{SizeInMB: 5000}, // 5GB
 }
 
 // Benchmark for ReadLastNLines with a large log file
@@ -89,7 +91,7 @@ func Benchmark_ReadLastNLines(b *testing.B) {
 
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				_, err := ReadLastNLines(logFilePath, 1000, "")
+				_, err := ReadLastNLines(logFilePath, 1000, "services.html")
 				if err != nil {
 					b.Fatalf("Failed to read last N lines: %v", err)
 				}
