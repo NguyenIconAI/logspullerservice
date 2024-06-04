@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"testing"
+
+	"github.com/NguyenIconAI/logspullerservice/constants"
 )
 
 // Response structure
@@ -26,7 +29,14 @@ func contains(slice []string, item string) bool {
 
 // Integration test to check if server returns a list of log files
 func IntegTest_GetLogFiles(t *testing.T) {
-	resp, err := http.Get("http://localhost:3000/v1/logs")
+	bearer := "Bearer " + os.Getenv(constants.ApiKeyEnvVar)
+	url := "http://localhost:3000/v1/logs"
+
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", bearer)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Errorf("error: %v", err)
 		t.FailNow()
@@ -60,8 +70,15 @@ func IntegTest_GetLogFiles(t *testing.T) {
 }
 
 func IntegTest_GetLogContent(t *testing.T) {
+	bearer := "Bearer " + os.Getenv(constants.ApiKeyEnvVar)
 	expectedLength := 10
-	resp, err := http.Get(fmt.Sprintf("http://localhost:3000/v1/log?file=auth.log&n=%d&filter=session", expectedLength))
+	url := fmt.Sprintf("http://localhost:3000/v1/log?file=auth.log&n=%d&filter=session", expectedLength)
+
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", bearer)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		t.Errorf("error: %v", err)
 		t.FailNow()
