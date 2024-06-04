@@ -113,6 +113,18 @@ To run benchmark tests, use the following command:
 make benchmark-test
 ```
 
+The test will prepare an apache access.log files with random information and get the last 1000 lines with filter. The file sizes is vary from 10MB to 5GB.
+
+```
+	{SizeInMB: 10},   // 10MB
+	{SizeInMB: 100},  // 100MB
+	{SizeInMB: 200},  // 200MB
+	{SizeInMB: 500},  // 500MB
+	{SizeInMB: 1000}, // 1GB
+	{SizeInMB: 2000}, // 2GB
+	{SizeInMB: 5000}, // 5GB
+```
+
 ## API Endpoints
 
 ### Health Check
