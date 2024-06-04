@@ -19,7 +19,7 @@ func NewServer(port string) *Server {
 // Start a server instance
 func (s *Server) Start() error {
 	http.HandleFunc("/health", s.handleHealthCheck)
-
+	http.HandleFunc("/logs", s.handleGetLogFiles)
 	// TODO: Adding authentication and logging middleware
 	return http.ListenAndServe(s.port, nil)
 }

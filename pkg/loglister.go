@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"os"
 	"path/filepath"
-	"unicode"
+	"unicode/utf8"
 )
 
-// Check if a file is a text file by reading the first 1024 bytes and checking for null bytes or non-printable characters.
+// Check if a file is a text file by reading the first line and check if it's a valid utf8 string.
 func isTextFile(path string) (bool, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -15,25 +15,11 @@ func isTextFile(path string) (bool, error) {
 	}
 	defer file.Close()
 
-	reader := bufio.NewReader(file)
-	sampleSize := 1024 // Number of bytes to sample
-	readBytes, err := reader.Peek(sampleSize)
-	if err != nil && err != bufio.ErrBufferFull {
-		return false, err
-	}
+	fileScanner := bufio.NewScanner(file)
+	fileScanner.Split(bufio.ScanLines)
+	fileScanner.Scan()
 
-	for _, b := range readBytes {
-		if b == 0 {
-			// Null byte detected, likely a binary file
-			return false, nil
-		}
-		if !unicode.IsPrint(rune(b)) && !unicode.IsSpace(rune(b)) {
-			// Non-printable and non-space character detected, likely a binary file
-			return false, nil
-		}
-	}
-
-	return true, nil
+	return utf8.ValidString(string(fileScanner.Text())), nil
 }
 
 // ListLogFiles returns a list of log files in a directory.
@@ -42,11 +28,17 @@ func ListLogFiles(logDir string) ([]string, error) {
 
 	err := filepath.Walk(logDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			if os.IsPermission(err) {
+				return nil // Ignore permission errors, does not consider the file
+			}
 			return err
 		}
 		if !info.IsDir() {
 			isText, err := isTextFile(path)
 			if err != nil {
+				if os.IsPermission(err) {
+					return nil // Ignore permission errors, does not consider the file
+				}
 				return err
 			}
 			if isText {
