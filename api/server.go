@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/NguyenIconAI/logspullerservice/middleware"
 )
 
 type Server struct {
@@ -18,10 +20,10 @@ func NewServer(port string) *Server {
 
 // Start a server instance
 func (s *Server) Start() error {
-	http.HandleFunc("/health", s.handleHealthCheck)
-	http.HandleFunc("/v1/logs", s.handleGetLogFiles)
-	http.HandleFunc("/v1/log", s.handleReadLogFile)
-	// TODO: Adding authentication and logging middleware
+	http.Handle("/health", http.HandlerFunc(s.handleHealthCheck))
+	http.Handle("/v1/logs", middleware.AuthMiddleware(http.HandlerFunc(s.handleGetLogFiles)))
+	http.Handle("/v1/log", middleware.AuthMiddleware(http.HandlerFunc(s.handleReadLogFile)))
+	// TODO: Adding logging middleware
 	return http.ListenAndServe(s.port, nil)
 }
 

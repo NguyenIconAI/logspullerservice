@@ -89,7 +89,14 @@ paths:
           description: Internal server error
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Get log files
       tags:
       - logs
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

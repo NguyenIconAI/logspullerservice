@@ -8,6 +8,7 @@ This is a log puller service that provides a RESTful API for retrieving log file
 - Retrieve a list of log files from a specified directory.
 - Read the last N lines from a specific log file with optional filtering.
 - Swagger documentation for API endpoints.
+- Middleware to check for an authorization key.
 
 ## Installation
 
@@ -22,10 +23,46 @@ go mod tidy
 To start the server, use the following command:
 
 ```sh
-go run main.go
+make server
 ```
 
 The server will run on the port specified (default is `:3000`).
+
+## Building the Project
+
+To build the project, including generating the Swagger documentation, use:
+
+```sh
+make build
+```
+
+This will generate the Swagger documentation and build the executable in the `bin/` directory.
+
+## Running Tests
+
+### Unit Tests
+
+To run unit tests, use the following command:
+
+```sh
+make test
+```
+
+### Integration Tests
+
+To run integration tests, use the following command:
+
+```sh
+make integ-test
+```
+
+### Benchmark Tests
+
+To run benchmark tests, use the following command:
+
+```sh
+make benchmark-test
+```
 
 ## API Endpoints
 
@@ -74,17 +111,28 @@ The server will run on the port specified (default is `:3000`).
 
 ## Middleware
 
-TODO: Adding authentication and logging middleware.
+### Authorization Middleware
+
+The service includes a middleware to check for an `Authorization` header. The header must be in the format `Bearer your-secret-token`. If the token is invalid or missing, the request will be rejected with a `401 Unauthorized` status.
 
 ## Swagger Documentation
 
 The API documentation is generated using Swagger. To generate the documentation, run:
 
 ```sh
-swag init -g main.go
+make build
 ```
 
 You can access the Swagger documentation at `http://localhost:3000/swagger/index.html`.
+
+### Using the Authorization Header in Swagger UI
+
+To execute the endpoints that require authorization using Swagger UI, follow these steps:
+
+1. Open the Swagger UI at `http://localhost:3000/swagger/index.html`.
+2. Click on the `Authorize` button at the top right of the page.
+3. Enter your token in the `Value` field in the format `Bearer your-secret-token`.
+4. Click the `Authorize` button and then the `Close` button.
 
 ## Makefile Commands
 
@@ -93,13 +141,13 @@ The project includes a `Makefile` with the following commands:
 - **Start the server**:
 
   ```sh
-  go run main.go
+  make server
   ```
 
-- **Run sanity check**:
+- **Build the project** (includes generating Swagger documentation):
 
   ```sh
-  make integ-test
+  make build
   ```
 
 - **Run unit tests**:
@@ -108,7 +156,13 @@ The project includes a `Makefile` with the following commands:
   make test
   ```
 
-- **Run benchmarks**:
+- **Run integration tests**:
+
+  ```sh
+  make integ-test
+  ```
+
+- **Run benchmark tests**:
   ```sh
   make benchmark-test
   ```
@@ -116,11 +170,3 @@ The project includes a `Makefile` with the following commands:
 ## Contributing
 
 Feel free to fork this repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
-
-[Insert License Here]
-
-## Contact
-
-For any issues or inquiries, please contact [vdnguyen58@gmail.com].

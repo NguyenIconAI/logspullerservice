@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/NguyenIconAI/logspullerservice/api"
+	"github.com/NguyenIconAI/logspullerservice/constants"
 	_ "github.com/NguyenIconAI/logspullerservice/docs" // Swagger docs
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -25,10 +27,18 @@ import (
 
 // @host localhost:3000
 // @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	port := flag.String("port", ":3000", "the listening port")
+	apiKey := os.Getenv(constants.ApiKeyEnvVar)
 	flag.Parse()
 
+	if apiKey == "" {
+		log.Fatal("API key is required")
+	}
 	server := api.NewServer(*port)
 
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)

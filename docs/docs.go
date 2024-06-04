@@ -106,6 +106,11 @@ const docTemplate = `{
         },
         "/v1/logs": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Returns a list of log files in a directory",
                 "produces": [
                     "application/json"
@@ -142,6 +147,13 @@ const docTemplate = `{
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

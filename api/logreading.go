@@ -8,10 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/NguyenIconAI/logspullerservice/constants"
 	logHandler "github.com/NguyenIconAI/logspullerservice/pkg"
 )
-
-const baseDir = "/var/log"
 
 // handleReadLogFile handles the read log file endpoint
 // @Summary Read log file
@@ -80,10 +79,10 @@ func sanitizeFilePath(filePath string) (string, error) {
 		return "", fmt.Errorf("invalid file path")
 	}
 
-	fullPath := baseDir + "/" + cleanPath
+	fullPath := constants.LogFilesPath + "/" + cleanPath
 
 	// Ensure the full path starts with the base directory
-	if !strings.HasPrefix(fullPath, baseDir) {
+	if !strings.HasPrefix(fullPath, constants.LogFilesPath) {
 		return "", fmt.Errorf("invalid file path")
 	}
 

@@ -1,6 +1,10 @@
 server:
 	go run main.go
 
+build:
+	swag init -g main.go
+	go build -o bin/server main.go
+
 benchmark-test:
 	go test ./... -bench=.
 

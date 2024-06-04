@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/NguyenIconAI/logspullerservice/constants"
 	logHandler "github.com/NguyenIconAI/logspullerservice/pkg"
 )
 
@@ -18,9 +19,10 @@ type GetLogFilesResponse struct {
 // @Produce json
 // @Success 200 {object} GetLogFilesResponse
 // @Failure 500 {string} string "Internal server error"
+// @Security ApiKeyAuth
 // @Router /v1/logs [get]
 func (s *Server) handleGetLogFiles(w http.ResponseWriter, r *http.Request) {
-	logFiles, err := logHandler.ListLogFiles("/var/log")
+	logFiles, err := logHandler.ListLogFiles(constants.LogFilesPath)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
