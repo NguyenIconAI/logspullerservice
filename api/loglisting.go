@@ -11,18 +11,14 @@ type GetLogFilesResponse struct {
 	LogFiles []string `json:"files"`
 }
 
-// handleGetLogFiles returns a list of log files in a directory.
-// GET /logs
-// Response: 200 OK
-//
-//	{
-//	  "files": [
-//	    "/var/log/syslog",
-//	    "/var/log/messages",
-//	    "/var/log/nginx/access.log",
-//	    "/var/log/nginx/error.log"
-//	  ]
-//	}
+// handleGetLogFiles handles the get log files endpoint
+// @Summary Get log files
+// @Description Returns a list of log files in a directory
+// @Tags logs
+// @Produce json
+// @Success 200 {object} GetLogFilesResponse
+// @Failure 500 {string} string "Internal server error"
+// @Router /v1/logs [get]
 func (s *Server) handleGetLogFiles(w http.ResponseWriter, r *http.Request) {
 	logFiles, err := logHandler.ListLogFiles("/var/log")
 	if err != nil {

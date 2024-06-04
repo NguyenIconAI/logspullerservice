@@ -25,7 +25,13 @@ func (s *Server) Start() error {
 	return http.ListenAndServe(s.port, nil)
 }
 
-// Return OK
+// handleHealthCheck handles the health check endpoint
+// @Summary Health check endpoint
+// @Description Returns the status of the server
+// @Tags health
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Router /health [get]
 func (s *Server) handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 	status := struct {
 		Status string `json:"status"`

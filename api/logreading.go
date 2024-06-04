@@ -13,15 +13,19 @@ import (
 
 const baseDir = "/var/log"
 
-// handleReadLogFile reads the last N lines from a log file and returns them as a JSON array.
-// GET /log?file=<file>&n=<n>
-// Response: 200 OK
-//
-//	[
-//	  "line 1",
-//	  "line 2",
-//	  "line 3"
-//	]
+// handleReadLogFile handles the read log file endpoint
+// @Summary Read log file
+// @Description Reads the last N lines from a log file and returns them as a JSON array
+// @Tags logs
+// @Produce json
+// @Param file query string true "Log file"
+// @Param n query int true "Number of lines"
+// @Param filter query string false "Filter"
+// @Success 200 {array} string
+// @Failure 400 {string} string "Invalid 'n' parameter"
+// @Failure 400 {string} string "Missing 'file' parameter"
+// @Failure 500 {string} string "Internal server error"
+// @Router /v1/log [get]
 func (s *Server) handleReadLogFile(w http.ResponseWriter, r *http.Request) {
 	numOfLinesStr := r.URL.Query().Get("n")
 	numOfLines, err := strconv.Atoi(numOfLinesStr)
