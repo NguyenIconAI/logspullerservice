@@ -29,6 +29,8 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 	}
 	size := stat.Size()
 
+	filterSize := int64(len(filter))
+
 	// Determine chunk size
 	var chunkSize int64 = 64 * 1024 // 64KB chunks
 	if size < chunkSize {
@@ -47,7 +49,7 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 		wg.Add(1)
 		go func(start int64) {
 			defer wg.Done()
-			readChunkAndProcess(file, start, chunkSize, linesCh)
+			readChunkAndProcess(file, start, chunkSize, filterSize, linesCh)
 		}(size - (i+1)*chunkSize)
 	}
 
@@ -72,8 +74,10 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 }
 
 // readChunkAndProcess reads a chunk of the file and sends lines to the channel for further processing.
-func readChunkAndProcess(file *os.File, start, size int64, linesCh chan<- string) {
-	buf := make([]byte, size)
+func readChunkAndProcess(file *os.File, start, size int64, filterSize int64, linesCh chan<- string) {
+	// reading extra bytes to handle the case where a line is split between two chunks
+	// this size is small considering the typical size of a page
+	buf := make([]byte, size+filterSize-1)
 	_, err := file.Seek(start, io.SeekStart)
 	if err != nil {
 		return
