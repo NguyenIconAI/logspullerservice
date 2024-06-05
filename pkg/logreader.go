@@ -27,13 +27,21 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 	}
 	size := stat.Size()
 
-	// Seek from the end
-	var lines []string
-	buf := make([]byte, 1)
-	line := ""
+	var chunkSize int64
+	chunkSize = 4096
+	if size < chunkSize {
+		chunkSize = size
+	}
 
+	// Seek from the end
+	lines := make([]string, n)
+	buf := make([]byte, chunkSize)
+	line := ""
+	l := 0
+	var i int64
 	// Start reading from the end of the file
-	for i := size - 1; i > 0 && len(lines) < n; i-- {
+	for i = size - chunkSize; i >= 0; i -= chunkSize {
+		fmt.Println(i)
 		_, err := file.Seek(i, io.SeekStart)
 		if err != nil {
 			return nil, err
@@ -44,26 +52,65 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 			return nil, err
 		}
 
-		// If we find a newline character, we have a line
-		if buf[0] == '\n' {
-			if line != "" {
-				// TODO - Optimize the contains check while gathering the buffer
-				if filter == "" || strings.Contains(line, filter) {
-					lines = append(lines, line)
+		for j := chunkSize - 1; j >= 0; j-- {
+			// If we find a newline character, we have a line
+			if buf[j] == '\n' {
+				if line != "" {
+					if filter == "" || strings.Contains(line, filter) {
+						lines[l] = line
+						l++
+						if l == n {
+							return lines, nil
+						}
+					}
+					line = ""
 				}
-				line = ""
+			} else {
+				line = string(buf[j]) + line
 			}
-		} else {
-			line = string(buf) + line
+		}
+	}
+
+	// Read any remaining bytes
+	if i < 0 && l < n {
+		_, err := file.Seek(0, io.SeekStart)
+		if err != nil {
+			return nil, err
+		}
+
+		remainingBytes := make([]byte, i+chunkSize)
+		_, err = file.Read(remainingBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		for j := len(remainingBytes) - 1; j >= 0; j-- {
+			if remainingBytes[j] == '\n' {
+				if line != "" {
+					if filter == "" || strings.Contains(line, filter) {
+						lines = append(lines, line)
+					}
+					line = ""
+				}
+			} else {
+				line = string(remainingBytes[j]) + line
+			}
 		}
 	}
 
 	// If we have a line that is not empty, add it to the list
-	if line != "" && len(lines) < n {
+	if line != "" && l < n {
 		if filter == "" || strings.Contains(line, filter) {
 			lines = append(lines, line)
 		}
 	}
 
-	return lines, nil
+	result := make([]string, 0, n)
+	for i := 0; i < len(lines); i++ {
+		if lines[i] != "" {
+			result = append(result, lines[i])
+		}
+	}
+
+	return result, nil
 }

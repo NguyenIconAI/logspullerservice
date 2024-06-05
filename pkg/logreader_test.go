@@ -1,5 +1,3 @@
-//go:build unit
-
 package pkg
 
 import (
@@ -61,15 +59,18 @@ line12`
 		lines, err := ReadLastNLines(tmpfile.Name(), test.n, test.filter)
 		if err != nil {
 			t.Errorf("Failed to read last %d lines: %v", test.n, err)
+			t.FailNow()
 		}
 
 		if len(lines) != len(test.expected) {
 			t.Errorf("Expected %d lines, got %d lines", len(test.expected), len(lines))
+			t.FailNow()
 		}
 
 		for i := range lines {
 			if lines[i] != test.expected[i] {
 				t.Errorf("Expected line %q, got %q", test.expected[i], lines[i])
+				t.FailNow()
 			}
 		}
 	}

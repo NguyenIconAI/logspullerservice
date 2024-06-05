@@ -70,28 +70,48 @@ func generateLargeLog(filePath string, targetSizeMB int) error {
 var table = []struct {
 	SizeInMB int
 }{
-	{SizeInMB: 10},   // 10MB
-	{SizeInMB: 100},  // 100MB
-	{SizeInMB: 200},  // 200MB
-	{SizeInMB: 500},  // 500MB
+	// {SizeInMB: 10},   // 10MB
+	// {SizeInMB: 100},  // 100MB
+	// {SizeInMB: 200},  // 200MB
+	// {SizeInMB: 500},  // 500MB
 	{SizeInMB: 1000}, // 1GB
-	{SizeInMB: 2000}, // 2GB
-	{SizeInMB: 5000}, // 5GB
+	// {SizeInMB: 2000}, // 2GB
+	// {SizeInMB: 5000}, // 5GB
 }
 
 // Benchmark for ReadLastNLines with a large log file
-func Benchmark_ReadLastNLines(b *testing.B) {
+// func Benchmark_ReadLastNLines(b *testing.B) {
+// 	for _, v := range table {
+// 		b.Run(fmt.Sprintf("input_size_%d", v.SizeInMB), func(b *testing.B) {
+// 			logFilePath := "large_access.log"
+// 			err := generateLargeLog(logFilePath, v.SizeInMB)
+// 			if err != nil {
+// 				b.Fatalf("Failed to generate log file: %v", err)
+// 			}
+
+// 			b.ResetTimer()
+// 			for n := 0; n < b.N; n++ {
+// 				_, err := ReadLastNLines(logFilePath, 1000, "services.html")
+// 				if err != nil {
+// 					b.Fatalf("Failed to read last N lines: %v", err)
+// 				}
+// 			}
+// 		})
+// 	}
+// }
+
+func Benchmark_ReadLastNLines_NotFound(b *testing.B) {
 	for _, v := range table {
 		b.Run(fmt.Sprintf("input_size_%d", v.SizeInMB), func(b *testing.B) {
 			logFilePath := "large_access.log"
-			err := generateLargeLog(logFilePath, targetSizeMB)
+			err := generateLargeLog(logFilePath, v.SizeInMB)
 			if err != nil {
 				b.Fatalf("Failed to generate log file: %v", err)
 			}
 
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
-				_, err := ReadLastNLines(logFilePath, 1000, "services.html")
+				_, err := ReadLastNLines(logFilePath, 1000, "iddqd")
 				if err != nil {
 					b.Fatalf("Failed to read last N lines: %v", err)
 				}
