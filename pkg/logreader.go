@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -27,40 +28,41 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 	}
 	size := stat.Size()
 
+	// Determine chunk size
 	var chunkSize int64
-	chunkSize = 4096
+	chunkSize = 64 * 1024 // 64KB chunks
 	if size < chunkSize {
 		chunkSize = size
 	}
-
-	// Seek from the end
-	lines := make([]string, n)
 	buf := make([]byte, chunkSize)
+
+	// Initialize the lines slice with a fixed capacity
+	lines := make([]string, n)
 	line := ""
-	l := 0
+	lineCount := 0
+
+	// Buffered reading from the end
+	reader := bufio.NewReader(file)
 	var i int64
-	// Start reading from the end of the file
-	for i = size - chunkSize; i >= 0; i -= chunkSize {
-		fmt.Println(i)
+	for i = size - int64(chunkSize); i >= 0; i -= int64(chunkSize) {
 		_, err := file.Seek(i, io.SeekStart)
 		if err != nil {
 			return nil, err
 		}
 
-		_, err = file.Read(buf)
-		if err != nil {
+		_, err = io.ReadFull(reader, buf)
+		if err != nil && err != io.EOF {
 			return nil, err
 		}
 
 		for j := chunkSize - 1; j >= 0; j-- {
-			// If we find a newline character, we have a line
 			if buf[j] == '\n' {
 				if line != "" {
 					if filter == "" || strings.Contains(line, filter) {
-						lines[l] = line
-						l++
-						if l == n {
-							return lines, nil
+						lines[lineCount] = line
+						lineCount++
+						if lineCount >= n {
+							break
 						}
 					}
 					line = ""
@@ -69,10 +71,11 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 				line = string(buf[j]) + line
 			}
 		}
+		reader.Reset(file)
 	}
 
-	// Read any remaining bytes
-	if i < 0 && l < n {
+	// Read any remaining characters at the start of the file
+	if i < 0 && lineCount < n {
 		_, err := file.Seek(0, io.SeekStart)
 		if err != nil {
 			return nil, err
@@ -88,7 +91,11 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 			if remainingBytes[j] == '\n' {
 				if line != "" {
 					if filter == "" || strings.Contains(line, filter) {
-						lines = append(lines, line)
+						lines[lineCount] = line
+						lineCount++
+						if lineCount >= n {
+							break
+						}
 					}
 					line = ""
 				}
@@ -98,15 +105,16 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 		}
 	}
 
-	// If we have a line that is not empty, add it to the list
-	if line != "" && l < n {
+	// If there's still a line remaining, add it
+	if line != "" && lineCount < n {
 		if filter == "" || strings.Contains(line, filter) {
-			lines = append(lines, line)
+			lines[lineCount] = line
 		}
 	}
 
-	result := make([]string, 0, n)
-	for i := 0; i < len(lines); i++ {
+	// Extract the last N lines in correct order
+	result := make([]string, 0, lineCount)
+	for i := 0; i < lineCount; i++ {
 		if lines[i] != "" {
 			result = append(result, lines[i])
 		}

@@ -103,12 +103,13 @@ var table = []struct {
 func Benchmark_ReadLastNLines_NotFound(b *testing.B) {
 	for _, v := range table {
 		b.Run(fmt.Sprintf("input_size_%d", v.SizeInMB), func(b *testing.B) {
+			fmt.Println("Start generating large log file...")
 			logFilePath := "large_access.log"
 			err := generateLargeLog(logFilePath, v.SizeInMB)
 			if err != nil {
 				b.Fatalf("Failed to generate log file: %v", err)
 			}
-
+			fmt.Println("Start benchmarking...")
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				_, err := ReadLastNLines(logFilePath, 1000, "iddqd")
