@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 )
 
 // ReadLastNLines reads the last N lines from a file and returns them as a slice of strings.
@@ -29,96 +30,63 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 	size := stat.Size()
 
 	// Determine chunk size
-	var chunkSize int64
-	chunkSize = 64 * 1024 // 64KB chunks
+	var chunkSize int64 = 64 * 1024 // 64KB chunks
 	if size < chunkSize {
 		chunkSize = size
 	}
-	buf := make([]byte, chunkSize)
 
-	// Initialize the lines slice with a fixed capacity
-	lines := make([]string, n)
-	line := ""
-	lineCount := 0
+	// Create channels for communication between goroutines
+	linesCh := make(chan string, n)
+	wg := sync.WaitGroup{}
 
-	// Buffered reading from the end
-	reader := bufio.NewReader(file)
-	var i int64
-	for i = size - int64(chunkSize); i >= 0; i -= int64(chunkSize) {
-		_, err := file.Seek(i, io.SeekStart)
-		if err != nil {
-			return nil, err
-		}
+	// Determine the number of goroutines needed
+	numGoroutines := (size-1)/chunkSize + 1
 
-		_, err = io.ReadFull(reader, buf)
-		if err != nil && err != io.EOF {
-			return nil, err
-		}
-
-		for j := chunkSize - 1; j >= 0; j-- {
-			if buf[j] == '\n' {
-				if line != "" {
-					if filter == "" || strings.Contains(line, filter) {
-						lines[lineCount] = line
-						lineCount++
-						if lineCount >= n {
-							break
-						}
-					}
-					line = ""
-				}
-			} else {
-				line = string(buf[j]) + line
-			}
-		}
-		reader.Reset(file)
+	// Start goroutines to read and process chunks concurrently
+	for i := int64(0); i < numGoroutines; i++ {
+		wg.Add(1)
+		go func(start int64) {
+			defer wg.Done()
+			readChunkAndProcess(file, start, chunkSize, linesCh)
+		}(size - (i+1)*chunkSize)
 	}
 
-	// Read any remaining characters at the start of the file
-	if i < 0 && lineCount < n {
-		_, err := file.Seek(0, io.SeekStart)
-		if err != nil {
-			return nil, err
-		}
+	// Wait for all goroutines to finish
+	go func() {
+		wg.Wait()
+		close(linesCh)
+	}()
 
-		remainingBytes := make([]byte, i+chunkSize)
-		_, err = file.Read(remainingBytes)
-		if err != nil {
-			return nil, err
-		}
-
-		for j := len(remainingBytes) - 1; j >= 0; j-- {
-			if remainingBytes[j] == '\n' {
-				if line != "" {
-					if filter == "" || strings.Contains(line, filter) {
-						lines[lineCount] = line
-						lineCount++
-						if lineCount >= n {
-							break
-						}
-					}
-					line = ""
-				}
-			} else {
-				line = string(remainingBytes[j]) + line
-			}
-		}
-	}
-
-	// If there's still a line remaining, add it
-	if line != "" && lineCount < n {
+	// Collect lines from channels
+	var lines []string
+	for line := range linesCh {
 		if filter == "" || strings.Contains(line, filter) {
-			lines[lineCount] = line
+			lines = append(lines, line)
+			if len(lines) == n {
+				break
+			}
 		}
 	}
 
-	// Extract the last N lines in correct order
-	result := make([]string, 0, lineCount)
-	for i := 0; i < lineCount; i++ {
-		if lines[i] != "" {
-			result = append(result, lines[i])
-		}
+	return lines, nil
+}
+
+// readChunkAndProcess reads a chunk of the file and sends lines to the channel for further processing.
+func readChunkAndProcess(file *os.File, start, size int64, linesCh chan<- string) {
+	buf := make([]byte, size)
+	_, err := file.Seek(start, io.SeekStart)
+	if err != nil {
+		return
 	}
 
-	return result, nil
+	reader := bufio.NewReader(file)
+	_, err = io.ReadFull(reader, buf)
+	if err != nil && err != io.EOF {
+		return
+	}
+
+	lines := strings.Split(string(buf), "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		linesCh <- lines[i]
+	}
 }
