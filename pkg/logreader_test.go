@@ -50,10 +50,10 @@ line12`
 		expected []string
 	}{
 		{1, "", []string{"line12"}},
-		{5, "", []string{"line8", "line9", "line10", "line11", "line12"}},
-		{10, "", []string{"line3", "line4", "line5", "line6", "line7", "line8", "line9", "line10", "line11", "line12"}},
+		{5, "", []string{"line12", "line11", "line10", "line9", "line8"}},
+		{10, "", []string{"line12", "line11", "line10", "line9", "line8", "line7", "line6", "line5", "line4", "line3"}},
 		{1, "line1", []string{"line12"}},
-		{3, "line1", []string{"line10", "line11", "line12"}},
+		{3, "line1", []string{"line12", "line11", "line10"}},
 		{2, "line0", []string{}},
 	}
 

@@ -49,7 +49,7 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 			if line != "" {
 				// TODO - Optimize the contains check while gathering the buffer
 				if filter == "" || strings.Contains(line, filter) {
-					lines = append([]string{line}, lines...)
+					lines = append(lines, line)
 				}
 				line = ""
 			}
@@ -61,7 +61,7 @@ func ReadLastNLines(filename string, n int, filter string) ([]string, error) {
 	// If we have a line that is not empty, add it to the list
 	if line != "" && len(lines) < n {
 		if filter == "" || strings.Contains(line, filter) {
-			lines = append([]string{line}, lines...)
+			lines = append(lines, line)
 		}
 	}
 
