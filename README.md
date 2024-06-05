@@ -77,6 +77,12 @@ The server will run on the port specified (default is `:3000`) with a specific A
 
 ## Building the Project
 
+Install swaggo:
+
+```sh
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
 To build the project, including generating the Swagger documentation, use:
 
 ```sh
