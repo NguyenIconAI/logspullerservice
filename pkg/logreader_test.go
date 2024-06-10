@@ -1,14 +1,15 @@
+//go:build unit
+
 package pkg
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 )
 
 // createTempFile creates a temporary file with the given content.
 func createTempFile(t *testing.T, content string) *os.File {
-	tmpfile, err := ioutil.TempFile("", "example")
+	tmpfile, err := os.CreateTemp("", "example")
 	if err != nil {
 		t.Fatalf("Failed to create temp file: %v", err)
 	}
